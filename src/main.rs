@@ -13,8 +13,15 @@ fn main() {
 
     match validate_hex(transaction_hex) {
         Ok(_) => {
-            println!("Valid transaction hex: {}", transaction_hex);
-            // Proceed with decoding logic
+            match hex_to_bytes(transaction_hex) {
+                Ok(bytes) => {
+                    println!("Transaction bytes: {:?}", bytes);
+                    // Proceed with decoding the transaction
+                }
+                Err(err) => {
+                    eprintln!("Error converting hex to bytes: {}", err);
+                }
+            }
         }
         Err(err) => {
             eprintln!("Error: {}", err);
