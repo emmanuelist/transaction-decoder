@@ -1,13 +1,13 @@
 use std::io;
 
 fn main() {
-    println!("Welecome to the Transaction Decoder!");
+    println!("Welcome to the Transaction Decoder!");
 
-    println!("Enter a transaction hex: ");
+    println!("Enter a transaction hex:");
     let mut transaction_hex = String::new();
     io::stdin()
         .read_line(&mut transaction_hex)
-        .expect("Failed to read line");
+        .expect("Failed to read input");
 
     let transaction_hex = transaction_hex.trim();
 
@@ -27,30 +27,39 @@ fn main() {
             eprintln!("Error: {}", err);
         }
     }
-
-    // println!("You entered: {}", transaction_hex.trim());
 }
 
-/// Validate iif the input string is a valid hexadecimal string.
-///
-/// # Arguments
-/// * `hex` - A string slice that holds the hexadecimal string.
-///
-/// Returns
-///  * `Ok(())` if the input string is a valid hexadecimal string.
-/// * `Err(String)` if the input string is not a valid hexadecimal string.
+/// Validates if the input string is a valid hexadecimal string.
 fn validate_hex(hex: &str) -> Result<(), String> {
     if hex.is_empty() {
-        return Err("Empty string".to_string());
+        return Err("Input cannot be empty.".to_string());
     }
 
     if hex.len() % 2 != 0 {
-        return Err("Hex string must have an even number of characters".to_string());
+        return Err("Hex string must have an even number of characters.".to_string());
     }
 
     if !hex.chars().all(|c| c.is_ascii_hexdigit()) {
-        return Err("Hex string must contain only valid hexadecimal characters".to_string());
+        return Err("Input contains non-hexadecimal characters.".to_string());
     }
 
     Ok(())
+}
+
+/// Converts a hexadecimal string to a vector of bytes.
+///
+/// # Arguments
+/// * `hex` - A string slice that holds the hex string.
+///
+/// # Returns
+/// * `Ok(Vec<u8>)` containing the byte array if the conversion succeeds.
+/// * `Err(String)` with an error message if the conversion fails.
+fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, String> {
+    (0..hex.len())
+        .step_by(2)
+        .map(|i| {
+            u8::from_str_radix(&hex[i..i + 2], 16)
+                .map_err(|_| format!("Invalid hex byte: {}", &hex[i..i + 2]))
+        })
+        .collect()
 }
